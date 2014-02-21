@@ -1051,6 +1051,11 @@ class OVSSwitch( Switch ):
         self.cmd( 'ovs-vsctl -- set Bridge', self,
                   'other_config:datapath-id=' + self.dpid )
         self.cmd( 'ovs-vsctl set-fail-mode', self, self.failMode )
+
+        # set the openflow versions that the switch should support.
+        # TODO this should check what versions are supported by ovs. 
+        self.cmd( 'ovs-vsctl set bridge' self, 'protocols=OpenFlow10,OpenFlow12,OpenFlow13')
+
         for intf in self.intfList():
             if not intf.IP():
                 self.attach( intf )
