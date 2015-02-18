@@ -57,6 +57,7 @@ import pty
 import re
 import signal
 import select
+import socket
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -1354,7 +1355,8 @@ class Controller( Node ):
         if ':' in ip:
             ip, port = ip.split( ':' )
             port = int( port )
-        self.ip = ip
+        #should rename this to host, rather than ip.
+        self.ip = socket.gethostbyname(ip)
         self.port = port
         self.protocol = protocol
         Node.__init__( self, name, inNamespace=inNamespace,
