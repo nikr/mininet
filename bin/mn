@@ -25,15 +25,15 @@ from mininet.cli import CLI
 from mininet.log import lg, LEVELS, info, debug, warn, error
 from mininet.net import Mininet, MininetWithControlNet, VERSION
 from mininet.node import ( Host, CPULimitedHost, Controller, OVSController,
-                           RYU, NOX, RemoteController, findController,
+                           Ryu, NOX, RemoteController, findController,
                            DefaultController,
                            UserSwitch, OVSSwitch, OVSBridge,
-                           OVSLegacyKernelSwitch, IVSSwitch )
+                           IVSSwitch )
 from mininet.nodelib import LinuxBridge
 from mininet.link import Link, TCLink, OVSLink
 from mininet.topo import SingleSwitchTopo, LinearTopo, SingleSwitchReversedTopo
 from mininet.topolib import TreeTopo, TorusTopo
-from mininet.util import customConstructor, splitArgs
+from mininet.util import customClass, specialClass, splitArgs
 from mininet.util import buildTopo
 
 from functools import partial
@@ -62,22 +62,21 @@ SWITCHES = { 'user': UserSwitch,
              'ovsbr' : OVSBridge,
              # Keep ovsk for compatibility with 2.0
              'ovsk': OVSSwitch,
-             'ovsl': OVSLegacyKernelSwitch,
              'ivs': IVSSwitch,
              'lxbr': LinuxBridge,
              'default': OVSSwitch }
 
 HOSTDEF = 'proc'
 HOSTS = { 'proc': Host,
-          'rt': partial( CPULimitedHost, sched='rt' ),
-          'cfs': partial( CPULimitedHost, sched='cfs' ) }
+          'rt': specialClass( CPULimitedHost, defaults=dict( sched='rt' ) ),
+          'cfs': specialClass( CPULimitedHost, defaults=dict( sched='cfs' ) ) }
 
 CONTROLLERDEF = 'default'
 CONTROLLERS = { 'ref': Controller,
                 'ovsc': OVSController,
                 'nox': NOX,
                 'remote': RemoteController,
-                'ryu': RYU,
+                'ryu': Ryu,
                 'default': DefaultController,  # Note: replaced below
                 'none': lambda name: None }
 
@@ -311,10 +310,10 @@ class MininetRunner( object ):
                                      self.options.switch )
 
         topo = buildTopo( TOPOS, self.options.topo )
-        switch = customConstructor( SWITCHES, self.options.switch )
-        host = customConstructor( HOSTS, self.options.host )
-        controller = customConstructor( CONTROLLERS, self.options.controller )
-        link = customConstructor( LINKS, self.options.link )
+        switch = customClass( SWITCHES, self.options.switch )
+        host = customClass( HOSTS, self.options.host )
+        controller = customClass( CONTROLLERS, self.options.controller )
+        link = customClass( LINKS, self.options.link )
 
         if self.validate:
             self.validate( self.options )
